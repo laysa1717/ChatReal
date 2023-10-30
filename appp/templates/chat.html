@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat em Tempo Real</title>
+</head>
+<body>
+    <h1>Chat em Tempo Real</h1>
+    
+    
+    <ul id="messages">
+        {% for message in messages %}
+            <li>{{ message.author }}: {{ message.text }}</li>
+        {% endfor %}
+    </ul>
+
+    <input id="message_input" autocomplete="off">
+    <button id="send_button">Enviar</button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script>
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+        console.log('Conexão Socket.IO estabelecida com sucesso');
+        console.log(socket)
+
+        socket.on('message', function(data) {
+            var ul = document.getElementById('messages');
+            var li = document.createElement('li');
+            li.appendChild(document.createTextNode(data.message));
+            ul.appendChild(li);
+        });
+
+        document.getElementById('send_button').onclick = function() {
+            console.log('Botão "Enviar" clicado');
+            var message_input = document.getElementById('message_input');
+            var message = message_input.value;
+            message_input.value = '';
+            socket.emit('send_message', {message: message});
+        };
+    </script>
+</body>
+</html>
